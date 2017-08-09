@@ -1,12 +1,9 @@
 buildscript {
     repositories {
         jcenter()
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
     }
     dependencies {
-        classpath "us.kirchmeier:gradle-capsule-plugin:1.0.1"
+        classpath "com.android.tools.build:gradle:2.2.2"
     }
 }
 
@@ -14,33 +11,33 @@ repositories {
     jcenter()
 }
 
-apply plugin: 'java'
-apply plugin: 'us.kirchmeier.capsule'
-
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+apply plugin: 'com.android.library'
 
 dependencies {
+    compile project(":common")
 }
 
-jar {
-    manifest {
-        attributes 'Main-Class': 'com.mcxiaoke.packer.helper.PackerNg'
+android {
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+        encoding "UTF-8"
+    }
+
+    compileSdkVersion project.compileSdkVersion
+    buildToolsVersion project.buildToolsVersion
+
+    defaultConfig {
+        versionName project.VERSION_NAME
+        versionCode Integer.parseInt(project.VERSION_CODE)
+        minSdkVersion project.minSdkVersion
+        targetSdkVersion project.targetSdkVersion
+    }
+
+    lintOptions {
+        abortOnError false
+        htmlReport true
     }
 }
-
-task fatCapsule(type: FatCapsule) {
-    applicationClass 'com.mcxiaoke.packer.helper.PackerNg'
-    baseName 'ngpacker'
-    reallyExecutable
-}
-
-task helperJar(type: Copy) {
-    from fatCapsule.outputs
-    into new File(project.rootProject.rootDir, "tools")
-    // exclude '*SNAPSHOT*'
-    dependsOn fatCapsule
-
-}
-
 apply from: '../gradle-mvn-push.gradle'
